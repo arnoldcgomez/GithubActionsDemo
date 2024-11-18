@@ -23,7 +23,7 @@ def main():
     #Setting up JQuery
     query = {
         "jql": "project = 10000",
-        "maxResults": 100
+        "fields": ["summary", "assignee", "description", "issuelinks"]
     }
     try:
         #Make the API Request
