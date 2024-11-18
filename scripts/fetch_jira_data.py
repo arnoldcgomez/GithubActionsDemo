@@ -3,34 +3,34 @@ import requests
 import json
 
 def main():
-    #Loading the Env Variables
+    # Loading the Env Variables
     jira_domain = os.getenv("JIRA_DOMAIN")
     api_token = os.getenv("JIRA_API_TOKEN")
     username = os.getenv("JIRA_USERNAME")
 
-    #Validate environment variables
+    # Validate environment variables
     if not jira_domain or not api_token or not username:
-        print ("Error: Missing required environment variables")
+        print("Error: Missing required environment variables")
         return
 
-    #setting up the API endpoints and headers
+    # Setting up the API endpoints and headers
     url = f"{jira_domain}/rest/api/3/search"
     headers = {
         "Accept": "application/json",
         "Content-Type": "application/json"
     }
 
-    #Setting up JQuery
+    # Setting up JQL
     query = {
         "jql": "project = 10000",
         "fields": ["issuetype", "project", "description"]
     }
     try:
-        #Make the API Request
+        # Make the API Request
         response = requests.get(url, headers=headers, params=query, auth=requests.auth.HTTPBasicAuth(username, api_token))
 
-        #Process response
-       if response.status_code == 200:
+        # Process response
+        if response.status_code == 200:
             tasks = response.json()
             filtered_issues = []
 
@@ -51,9 +51,9 @@ def main():
                 print(json.dumps(filtered_issues, indent=4))
 
         else:
-            print("Failed to fetch data:",response.status_code, response.text)
+            print("Failed to fetch data:", response.status_code, response.text)
     except Exception as e:
-        print(f"An error occured: {e}")
+        print(f"An error occurred: {e}")
 
 if __name__ == "__main__":
     main()
