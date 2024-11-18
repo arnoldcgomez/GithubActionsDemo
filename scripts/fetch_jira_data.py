@@ -23,20 +23,33 @@ def main():
     #Setting up JQuery
     query = {
         "jql": "project = 10000",
-        "fields": ["summary", "assignee", "description", "issuelinks"]
+        "fields": ["issuetype", "project", "description"]
     }
     try:
         #Make the API Request
         response = requests.get(url, headers=headers, params=query, auth=requests.auth.HTTPBasicAuth(username, api_token))
 
         #Process response
-        if response.status_code == 200:
+       if response.status_code == 200:
             tasks = response.json()
-            output_file = "jira_tasks.json"
+            filtered_issues = []
+
+            # Extract required fields
+            for issue in tasks.get('issues', []):
+                filtered_data = {
+                    "key": issue["key"],
+                    "issuetype": issue["fields"].get("issuetype"),
+                    "project": issue["fields"].get("project"),
+                    "description": issue["fields"].get("description")
+                }
+                filtered_issues.append(filtered_data)
+
+            output_file = "filtered_jira_tasks.json"
             with open(output_file, "w") as json_file:
-                json.dump(tasks, json_file, indent=4)
-                print(f"Data saved to {output_file}")
-                print(json.dumps(tasks, indent=4))
+                json.dump({"issues": filtered_issues}, json_file, indent=4)
+                print(f"Filtered data saved to {output_file}")
+                print(json.dumps(filtered_issues, indent=4))
+
         else:
             print("Failed to fetch data:",response.status_code, response.text)
     except Exception as e:
