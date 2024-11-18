@@ -23,7 +23,7 @@ def main():
     # Setting up JQL
     query = {
         "jql": "project = 10000",
-        "fields": ["issuetype", "project", "description"]
+        "fields": ["issuetype", "project", "assignee", "description"]
     }
     try:
         # Make the API Request
