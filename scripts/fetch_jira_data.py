@@ -41,8 +41,8 @@ def main():
                     "key": issue["key"],
                     "issuetype": issue["fields"].get("issuetype"),
                     "project": issue["fields"].get("project"),
-                    "assignee": issue["fields"].get("assignee"),
-                    "description": issue["fields"].get("description")
+                    "assignee": issue["assignee"],
+                    "description": issue["description"]
                 }
                 filtered_issues.append(filtered_data)
 
