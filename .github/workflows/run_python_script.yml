@@ -28,3 +28,9 @@ jobs:
         JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
       run: |
         python scripts/fetch_jira_data.py
+
+    - name: Upload JSON Output
+      uses: actions/upload-artifact@v3
+      with:
+        name: jira-json-data
+        path: filtered_jira_tasks.json
