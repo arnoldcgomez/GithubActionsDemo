@@ -7,6 +7,7 @@ def main():
     jira_domain = os.getenv("JIRA_DOMAIN")
     api_token = os.getenv("JIRA_API_TOKEN")
     username = os.getenv("JIRA_USERNAME")
+    project_key = os.getenv("JIRA_PROJECT_KEY")
 
     # Validate environment variables
     if not jira_domain or not api_token or not username:
@@ -22,7 +23,7 @@ def main():
 
     # Setting up JQL
     query = {
-        "jql": "project = 10000",
+        "jql": f"project = {project_key}",
         "fields": ["issuetype", "project", "assignee", "description"]
     }
     try:
