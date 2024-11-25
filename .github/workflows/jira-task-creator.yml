@@ -1,0 +1,80 @@
+name: Repo Migration with Jira Integration
+
+on:
+  workflow_dispatch:
+  inputs:
+    repo_name:
+      description: "Repository to be Migrate"
+      required: true
+
+jobs:
+    migrate-repo:
+      runs-on: ubuntu-latest
+
+      steps:
+      #Checking the Github actions repository
+      - name: Checkout Repo
+        uses: actions/checkout@v3
+
+      - name: Create Jira Task
+        id: create-jira
+        env:
+          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME}}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
+          JIRA_PROJECT_KEY: ${{ secrets.JIRA_PROJECT_KEY }}
+        run: |
+          repo_name="${{github.event.inputs.repo_name}}"
+          jira_payload=$(jq -n --arg summary "Migrate $repo_name to GitHub"\
+                        --arg description "Automated task to migrate $repo_name from Bitbucket to GitHub."\
+                        --arg projectKey "$JIRA_PROJECT_KEY"\
+                        '{fields: {summary: $summary, description: $description, project: {key: $projectkey}, issueType: {name: "Task"}}}')
+          response=$(curl -s -o /tmp/jira_response.json -w "%{http_code}"\
+          -X POST -H "Content-Type: application/json"\
+          -u "$JIRA_USERNAME: $JIRA_API_TOKEN"\
+          -d "$jira_payload"\
+          "$JIRA_DOMAIN/rest/api/2/issue")
+
+          http_status=$response
+          if[ "$http_status" -ne 201 ]; then
+            echo "Failed to create Jira Task. Http Status: $http_status"
+            echo "Response: $(cat /tmp/jira_response.json)"
+            exit 1
+          fi
+
+          issue_key=$(jq -r '.key' /tmp/jira_response.json)
+          if[ -z "$issue_key" ]; then
+            echo "Jira issueKey not found in the response"
+            exit 1
+          fi
+
+          echo "JIRA_RESPONSE=$issue_key">>$GITHUB_ENV
+          echo "Created Jira Task: $issue_key"
+
+      - name: Clone BitBucket Repo
+        run: |
+          git clone --mirror "https://bitbucket.org/arnoldcgomez/${{github.event.inputs.repo_name}}.git"
+          echo "Cloned Bitbucket Repository"
+
+      - name: Push to Github Repo
+        run: |
+          cd "${{github.event.inputs.repo_name}}"
+          git remote add github "https://github.com/arnoldcgomez/${{github.event.inputs.repo_name}}.git"
+          git push --mirror github
+          echo "Repository Migrated to Github"
+
+      - name: Update Jira Task as Completed
+        env:
+          JIRA_USERNAME: ${{ secrets.JIRA_USERNAME}}
+          JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
+          JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
+        run: |
+          issue_key=$(echo $JIRA_RESPONSE | jq -r '.key')
+          jira_update_payload=$(jq -n '{fields: {status: {name:"Done"}}}')
+          curl -X PUT -H "Content-Type: application/json"\
+            -u "$JIRA_USERNAME:$JIRA_API_TOKEN"\
+            -d "$jira_update_payload"\
+            "$JIRA_DOMAIN/rest/api/2/issue/$issue_key"
+          echo "Updated Jira Task $issue_key to Done"
+
+      
