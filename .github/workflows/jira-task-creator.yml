@@ -2,10 +2,10 @@ name: Repo Migration with Jira Integration
 
 on:
   workflow_dispatch:
-  inputs:
-    repo_name:
-      description: "Repository to be Migrated"
-      required: true
+    inputs:
+      repo_name:
+        description: "Repository to be Migrated"
+        required: true
 
 jobs:
     migrate-repo:
