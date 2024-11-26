@@ -7,7 +7,7 @@ def main(file_path):
     jira_server = os.getenv("JIRA_DOMAIN")
     jira_user = os.getenv("JIRA_USERNAME")
     jira_api_token = os.getenv("JIRA_API_TOKEN")
-    jira_project_key = os.getenv("JIRA_PROJECT_KEY")
+    jira_project_key = os.getenv("JIRA_PROJECT_ID")
 
     jira = JIRA(server=jira_server, basic_auth=(jira_user,jira_api_token))
 
