@@ -1,11 +1,12 @@
-name: Repo Migration with Jira Integration
+name: Create Jira Tasks from excel
 
 on:
   workflow_dispatch:
     inputs:
-      repo_name:
-        description: "Repository to be Migrated"
+      file_path:
+        description: "Path to Excel File"
         required: true
+        default: 'tasks.xlsx'
 
 jobs:
     migrate-repo:
