@@ -17,7 +17,7 @@ def main(file_path):
       print(f"Error reading Excel file: {e}")
       sys.exit(1)
 
-    required_columns = ["Summary", "Description", "issue Type"]
+    required_columns = ["Summary", "Description", "Issue Type"]
     if not all(column in tasks.columns for column in required_columns):
       print(f"Excel must contain the following columns: {', '.join(required_columns)}")
 
