@@ -26,7 +26,7 @@ def main(file_path):
             "project": {"key": jira_project_key},
             "summary": row["Summary"],
             "description": row["Description"],
-            "issuetype": row["Issue Type"]
+            "issuetype": {"name": row["Issue Type"]}
         }
 
         try:
