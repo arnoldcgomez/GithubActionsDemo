@@ -3,7 +3,7 @@ import pandas as pd
 from jira import JIRA
 import os
 
-def main(file_path)
+def main(file_path):
     jira_server = os.getenv("JIRA_DOMAIN")
     jira_user = os.getenv("JIRA_USERNAME")
     jira_api_token = os.getenv("JIRA_API_TOKEN")
