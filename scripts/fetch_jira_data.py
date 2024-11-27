@@ -45,7 +45,7 @@ def main():
 
     # Read task IDs from Excel file
     try:
-        task_ids = pd.read_excel(task_file)['Task ID']
+        task_ids = pd.read_excel(task_file)['id']
     except Exception as e:
         print(f"Error reading Excel file {task_file}: {e}")
         return
