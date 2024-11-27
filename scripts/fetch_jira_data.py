@@ -1,7 +1,6 @@
 import os
 import requests
 import json
-import pandas as pd  # Requires pandas to read Excel files
 
 def fetch_jira_task(task_id, jira_domain, username, api_token):
     """Fetch details of a single Jira task."""
@@ -36,19 +35,15 @@ def main():
     jira_domain = os.getenv("JIRA_DOMAIN")
     api_token = os.getenv("JIRA_API_TOKEN")
     username = os.getenv("JIRA_USERNAME")
-    task_file = os.getenv("JIRA_TASK_ID")  # Path to the Excel file with task IDs
+    task_ids_env = os.getenv("JIRA_TASK_IDS")  # Comma-separated task IDs
 
     # Validate environment variables
-    if not jira_domain or not api_token or not username or not task_file:
+    if not jira_domain or not api_token or not username or not task_ids_env:
         print("Error: Missing required environment variables")
         return
 
-    # Read task IDs from Excel file
-    try:
-        task_ids = pd.read_excel(task_file)['id']
-    except Exception as e:
-        print(f"Error reading Excel file {task_file}: {e}")
-        return
+    # Parse task IDs from environment variable
+    task_ids = [task_id.strip() for task_id in task_ids_env.split(",")]
 
     # Fetch data for each task ID
     all_tasks = []
