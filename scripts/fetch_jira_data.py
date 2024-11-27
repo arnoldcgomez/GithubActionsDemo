@@ -3,7 +3,6 @@ import requests
 import json
 
 def fetch_jira_task(task_id, jira_domain, username, api_token):
-    """Fetch details of a single Jira task."""
     url = f"{jira_domain}/rest/api/3/issue/{task_id}"
     headers = {
         "Accept": "application/json",
