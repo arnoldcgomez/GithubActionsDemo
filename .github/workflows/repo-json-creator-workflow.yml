@@ -3,10 +3,9 @@ name: jira-json-creator-workflow
 on:
   workflow_dispatch:
     inputs:
-      task_file:
-        description: 'The Excel file with Jira Task IDs'
+      task_ids:
+        description: 'Provide the Jira Task IDs'
         required: true
-        default: 'jira_tasks.xlsx'
 
 jobs:
   fetch-jira-tasks:
@@ -24,14 +23,14 @@ jobs:
     - name: Install Dependencies
       run: |
         python -m pip install --upgrade pip
-        pip install requests pandas openpyxl  # Add pandas and openpyxl for Excel handling
+        pip install requests pandas openpyxl
 
     - name: Run the Jira Fetch Script
       env:
         JIRA_USERNAME: ${{ secrets.JIRA_USERNAME }}
         JIRA_API_TOKEN: ${{ secrets.JIRA_API_TOKEN }}
         JIRA_DOMAIN: ${{ secrets.JIRA_DOMAIN }}
-        JIRA_TASK_ID: ${{ github.event.inputs.task_file }}  # Excel file path
+        JIRA_TASK_IDS: ${{ github.event.inputs.task_ids }}  # Comma-separated Task IDs
       run: |
         python scripts/fetch_jira_data.py
 
