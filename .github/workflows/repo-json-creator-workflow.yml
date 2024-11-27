@@ -1,4 +1,4 @@
-name: Run Python Script
+name: jira-json-creator-workflow
 
 on:
   workflow_dispatch:
@@ -6,7 +6,7 @@ on:
       task_file:
         description: 'The Excel file with Jira Task IDs'
         required: true
-        default: 'tasks.xlsx'
+        default: 'jira_tasks.xlsx'
 
 jobs:
   fetch-jira-tasks:
