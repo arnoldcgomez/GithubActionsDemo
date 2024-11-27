@@ -9,9 +9,6 @@ def main(file_path):
     jira_api_token = os.getenv("JIRA_API_TOKEN")
     jira_project_key = os.getenv("JIRA_PROJECT_KEY")
 
-    print("Inside main function")
-    print(f"Using Jira project key: {jira_project_key}")
-
     jira = JIRA(server=jira_server, basic_auth=(jira_user, jira_api_token))
 
     try:
