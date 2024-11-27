@@ -7,7 +7,7 @@ def main(file_path):
     jira_server = os.getenv("JIRA_DOMAIN")
     jira_user = os.getenv("JIRA_USERNAME")
     jira_api_token = os.getenv("JIRA_API_TOKEN")
-    jira_project_key = os.getenv("JIRA_PROJECT_ID")
+    jira_project_key = os.getenv("JIRA_PROJECT_KEY")
 
     print("Inside main function")
     print(f"Using Jira project key: {jira_project_key}")
