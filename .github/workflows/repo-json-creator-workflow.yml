@@ -39,5 +39,4 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: jira-json-data
-        path: |
-          *.json  # Upload all JSON files
+        path: all_jira_tasks.json
