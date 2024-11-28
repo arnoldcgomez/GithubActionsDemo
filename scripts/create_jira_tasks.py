@@ -22,41 +22,45 @@ def main(file_path):
         print(f"Excel must contain the following columns: {', '.join(required_columns)}")
         sys.exit(1)
 
-    # Dictionary to store created issues by their Parent Key for lookup
+    # Dictionary to store created issues by their Summary for lookup
     created_issues = {}
 
-    # Process rows by hierarchy
-    issue_types_order = ["Epic", "Story", "Sub-task"]  # Define order for processing
-    for issue_type in issue_types_order:
-        for _, row in tasks[tasks["Issue Type"] == issue_type].iterrows():
-            issue_data = {
-                "project": {"key": jira_project_key},
-                "summary": row["Summary"],
-                "description": row["Description"],
-                "issuetype": {"name": row["Issue Type"]},
-            }
+    # First Pass: Create all issues
+    for _, row in tasks.iterrows():
+        issue_data = {
+            "project": {"key": jira_project_key},
+            "summary": row["Summary"],
+            "description": row["Description"],
+            "issuetype": {"name": row["Issue Type"]},
+        }
 
-            # Check if the task has a parent and set the parent field accordingly
-            parent_key = row.get("Parent Key")
-            if pd.notna(parent_key):
-                parent_issue = created_issues.get(parent_key)
-                if parent_issue:
+        try:
+            # Create the issue in JIRA
+            issue = jira.create_issue(fields=issue_data)
+            print(f"Created issue {issue.key} ({row['Summary']})")
+            created_issues[row["Summary"]] = issue
+        except Exception as e:
+            print(f"Failed to create issue for row {_}: {e}")
+
+    # Second Pass: Link issues with their parents
+    for _, row in tasks.iterrows():
+        parent_key = row.get("Parent Key")
+        if pd.notna(parent_key):
+            # Retrieve parent issue
+            parent_issue = created_issues.get(parent_key)
+            child_issue = created_issues.get(row["Summary"])
+            if parent_issue and child_issue:
+                try:
                     if row["Issue Type"] == "Sub-task":
-                        issue_data["parent"] = {"key": parent_issue.key}
+                        # Add parent link for Sub-task
+                        jira.assign_issue(child_issue, {"parent": {"key": parent_issue.key}})
+                        print(f"Linked {child_issue.key} as a Sub-task of {parent_issue.key}")
                     else:
-                        print(f"Warning: Invalid parent-child relation for {row['Summary']}. Skipping.")
-                        continue
-                else:
-                    print(f"Parent issue '{parent_key}' not found for {row['Summary']}. Skipping.")
-                    continue
-
-            try:
-                # Create the issue in JIRA
-                issue = jira.create_issue(fields=issue_data)
-                print(f"Created issue {issue.key} ({row['Summary']})")
-                created_issues[row["Summary"]] = issue
-            except Exception as e:
-                print(f"Failed to create issue for row {_}: {e}")
+                        print(f"Warning: Unsupported parent-child link for {row['Summary']}.")
+                except Exception as e:
+                    print(f"Failed to link {row['Summary']} with parent {parent_key}: {e}")
+            else:
+                print(f"Parent or child issue not found for {row['Summary']}. Skipping.")
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
