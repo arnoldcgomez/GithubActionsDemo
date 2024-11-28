@@ -22,7 +22,7 @@ def main(file_path):
         print(f"Excel must contain the following columns: {', '.join(required_columns)}")
         sys.exit(1)
 
-    # Dictionary to store created issues by their summary for lookup
+    # Dictionary to store created issues by their Parent Key for lookup
     created_issues = {}
 
     # Process rows by hierarchy
@@ -51,6 +51,7 @@ def main(file_path):
                     continue
 
             try:
+                # Create the issue in JIRA
                 issue = jira.create_issue(fields=issue_data)
                 print(f"Created issue {issue.key} ({row['Summary']})")
                 created_issues[row["Summary"]] = issue
